@@ -1,0 +1,260 @@
+============================================================================step-1========================================================================
+npm init -y
+npm install express
+npm install typescript --save-dev
+tsc --init
+npm i cors
+npm i dotenv
+
+============================================================================step-2=========================================================================
+"rootDir": "./src",
+"outDir": "./dist",
+
+============================================================================step-3=========================================================================
+create src>app.ts file
+const express = require('express');
+
+const app = express()
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+========================================================================step-4===========================================================================
+create script file in the package.json
+"build":"tsc"
+
+=========================================================================step-5===========================================================================
+create server.ts file in the src file
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
+
+add mongoose 
+// getting-started.js
+const mongoose = require('mongoose');
+
+main().catch(err => console.log(err));
+
+async function main() {
+  await mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
+}
+
+===========================================================================step-6===========================================================================
+create .env file in the root and 
+<-------------------------------------------------------->
+PORT = 5000
+DATABASE_URL = mongodb+srv://<db_username>:<db_password>@cluster0.tuu4iju.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+<-------------------------------------------------------->
+
+go to mongodb database access and create a db_username and db_password.
+
+change <db_username> and <db_password>
+add database name befor between "/<data base name>?"
+as like /first-project?
+
+use it in the server.ts file
+
+=============================================================================step-7========================================================================
+make folder in the app folder name config. then create a file name index.ts
+
+And import dotenv and add path 
+<------------------------------------>
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+
+export default {
+  port: process.env.PORT,
+  database_url: process.env.DATABASE_URL,
+};
+
+<----------------------------------------->
+and use it in the server.ts file
+
+
+======================================================================step-8===============================================================================
+now change the app.ts file as like:
+
+<-------------------------------------------------------------->
+
+import express, { Application, Request, Response } from "express";
+const app: Application = express();
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World!");
+});
+
+export default app;
+
+<---------------------------------------------------------------->
+
+========================================================================step-9============================================================================
+use import for monoose and declare type
+<----------------------------------------------------------------->
+
+import app from "./app";
+import config from "./app/config";
+import mongoose from "mongoose";
+
+main().catch((err) => console.log(err));
+
+async function main() {
+  try {
+    await mongoose.connect(config.database_url as string);
+    app.listen(config.port, () => {
+      console.log(`Example app listening on port ${config.database_url}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+<------------------------------------------------------------->
+
+
+======================================================================step-10=================================================================================
+use parser in the app.ts file
+
+<---------------------------->
+app.use(express.json())
+app.use(cors())
+
+<------------------------->
+
+
+=====================================================================step-11================================================================================
+"include": ["src/**/*.ts"], // which files to compile
+"exclude": ["node_modules"], // which files to skip
+
+add this in the tsconfig.json file
+
+====================================================================step-12==================================================================================
+
+npm i -D eslint@9.14.0 @eslint/js @types/eslint__js typescript typescript-eslint
+npx eslint --init
+
+eslint: "^9.14.0" has been changed to eslint: "^9.15.0"
+
+if that happens remove the eslint : 
+npm remove eslint
+
+Then re-install: 
+npm i -D eslint@9.14.0
+
+=================================================================step-13====================================================================================
+Now add the following code inside eslint.config.mjs
+
+{
+    ignores: ["node_modules", "dist"],
+    rules: {
+      "no-unused-vars": "error",
+      "no-unused-expressions": "error",
+      "prefer-const": "error",
+      "no-console": "warn",
+      "no-undef": "error",
+    },
+ },
+
+
+
+==================================================================step-14====================================================================================
+add scripts for eslint in the package.json file.
+<--------------------------------------------------->
+"scripts": {
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
+  },
+
+<----------------------------------------------->
+
+====================================================================step-15=================================================================================
+Add the prettier package in your project.
+
+npm i -D --exact prettier
+
+
+create .prettierrc file in the root and add it.
+<-------------------------->
+{
+  "semi": true,
+  "singleQuote": true
+}
+<-------------------------->
+
+also create .prettierignore file in the root add it
+<---------------------------->
+dist
+coverage
+<---------------------------->
+
+add scripts for prettier as well in the package.json file.
+"prettier": "prettier . --write"
+=====================================================================step-16===============================================================================
+
+You can open your command palette (Command + Shift + P) and look for Preferences: Open User Settings (JSON). 
+Then you’ll need to change your editor’s default formatter and add an extra config to format code when you save your files:
+
+// settings.json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  ...
+}
+
+====================================================================step-17=============================================================================
+now install prettier and eslint extentions. Then reload the vs code.
+use ctrl+ shift + p. For reload select reload window.
+
+Avoiding conflicts when working with ESLint and Prettier:
+npm install --save-dev eslint-plugin-prettier eslint-config-prettier prettier
+
+With that installed, let’s go to the eslint.config.mjs file, 
+and add prettier at the end of your extends list to disable any other previous rules from other plugins:
+<-------------------------------------------------------->
+
+import globals from 'globals';
+import pluginJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-plugin-prettier/recommended';
+
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  { 
+    files: ['**/*.{js,mjs,cjs,ts}'], 
+    languageOptions: { globals: globals.node }, 
+    ignores: ['node_modules', 'dist'],
+    rules: {
+      'no-unused-vars': 'error',
+      'no-unused-expressions': 'error',
+      'prefer-const': 'error',
+      'no-console': 'warn',
+      'no-undef': 'error',
+    },
+  },
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  prettierConfig, // Add Prettier's recommended rules
+];
+<------------------------------------------------------------------->
+
+Finally, add this in the script
+
+"prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
+"prettier:fix": "npx prettier --write src",
+
+=============================================================step-18=================================================================================
+
+create .gitignore file in the project root path.
+
+node_modules
+dist
+.env
+
+
+
