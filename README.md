@@ -55,6 +55,9 @@ app.listen(port, () => {
 
 Install Mongoose and add the database connection:
 ```
+npm install mongoose --save
+```
+```
 const mongoose = require('mongoose');
 
 main().catch(err => console.log(err));
